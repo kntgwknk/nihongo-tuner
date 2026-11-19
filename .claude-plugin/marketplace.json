@@ -1,6 +1,7 @@
 {
   "name": "nihongo-tuner",
   "owner": { "name": "kntgwknk" },
+  "description": "日本語の文章を読みやすく自然に整えるスキル nihongo-tuner を配るマーケットプレイス。",
   "plugins": [
     {
       "name": "nihongo-tuner",
