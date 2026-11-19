@@ -1,0 +1,9 @@
+{
+  "name": "nihongo-tuner",
+  "description": "日本語の文章を、日本語のしくみを踏まえて読みやすく自然な文章に整えるスキル。AI の書き癖と翻訳調を減らし、事実・数値・識別子・確信の度合いは変えない。",
+  "version": "1.1.0",
+  "author": { "name": "kntgwknk" },
+  "homepage": "https://github.com/kntgwknk/nihongo-tuner",
+  "repository": "https://github.com/kntgwknk/nihongo-tuner",
+  "license": "MIT"
+}
