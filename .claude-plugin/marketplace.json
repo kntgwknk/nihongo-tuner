@@ -1,13 +1,13 @@
 {
   "name": "nihongo-tuner",
   "owner": { "name": "kntgwknk" },
-  "description": "日本語の文章を読みやすく自然に整えるスキル nihongo-tuner を配るマーケットプレイス。",
+  "description": "日本語の文章を読みやすく自然に整えるスキルnihongo-tunerを配るマーケットプレイス。",
   "plugins": [
     {
       "name": "nihongo-tuner",
       "source": "./",
       "description": "日本語の文章を、日本語のしくみを踏まえて読みやすく自然な文章に整えるスキル。",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": { "name": "kntgwknk" }
     }
   ]
