@@ -235,6 +235,31 @@ def minority_endings(prose: str) -> list[str]:
     return polite if len(polite) < len(plain) else plain
 
 
+# 和文の文字（かな・漢字・全角の句読点と括弧）。半角英数字とのあいだの空白を数える
+JA_CHARS = "ぁ-ゖァ-ヺー一-鿿々〆〇、。「」『』（）・：〜"
+JA_ALNUM_SPACE = re.compile(
+    rf"(?<=[{JA_CHARS}])[ \t]+(?=[A-Za-z0-9])|(?<=[A-Za-z0-9])[ \t]+(?=[{JA_CHARS}])"
+)
+
+
+def ja_alnum_spaces(text: str) -> list[str]:
+    """和文と半角英数字のあいだに入れた半角の空白。前後の数文字を添えて返す。
+
+    バッククォート内の識別子と URL は、まわりの空白ごと数えない（識別子の区切りとして
+    空白を入れる書き方があるため、この指標とは分けて扱う）。リンクは表示される文字だけを見る。
+    英字の語どうしの空白（「Claude Code」）は数えない。
+    """
+    body = re.sub(r"\[([^\]\n]*)\]\([^)\n]*\)", r"\1", text)
+    body = re.sub(r"`[^`\n]*`", "\0", body)
+    body = re.sub(r"https?://\S+", "\0", body)
+    found = []
+    for line in body.splitlines():
+        for m in JA_ALNUM_SPACE.finditer(line):
+            ctx = line[max(0, m.start() - 6) : m.end() + 6].replace("\0", "`…`")
+            found.append(ctx.strip())
+    return found
+
+
 def measure(path: Path) -> dict:
     text = strip_code(path.read_text(encoding="utf-8"))
     row = {k: len(re.findall(p, text)) for k, p in PATTERNS.items()}
@@ -259,7 +284,11 @@ def measure(path: Path) -> dict:
     # 文になっているのに句点で終わらない箇条書きの項目（表の外）
     unterminated = unterminated_items(prose)
     row["句点の落ちた項目"] = len(unterminated)
+    # 和文と半角英数字のあいだの空白（表の中も数える）
+    spaces = ja_alnum_spaces(text)
+    row["英数字の前後の空白"] = len(spaces)
     row["_list"] = {
+        "英数字の前後の空白": spaces,
         "句点の落ちた項目": unterminated,
         "読点なし長文": long_no_comma,
         "読点過多文": many_commas,
@@ -274,7 +303,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs="+")
     ap.add_argument("--json", action="store_true", help="JSON で出力する")
-    ap.add_argument("--list", action="store_true", help="読点の偏りがある文、句点の落ちた項目、少ないほうの文末の文を一覧する")
+    ap.add_argument("--list", action="store_true", help="読点の偏りがある文、句点の落ちた項目、少ないほうの文末の文、英数字の前後の空白を一覧する")
     args = ap.parse_args()
 
     rows = {}
@@ -296,6 +325,7 @@ def main() -> int:
             "読点が細かい文",
             "短い文の主語読点",
             "句点の落ちた項目",
+            "英数字の前後の空白",
         ]
     )
     total = {k: sum(r[k] for r in rows.values()) for k in keys}
